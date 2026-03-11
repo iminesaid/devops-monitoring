@@ -1,91 +1,148 @@
-# DevOps Monitoring Project
+# 🚀 DevOps Monitoring Project
 
-## Description
-Ce projet est une **application de monitoring DevOps** qui illustre l'intégration de Docker, Prometheus et Grafana pour surveiller une application web simple.  
+![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)
+![Flask](https://img.shields.io/badge/Flask-000000?style=for-the-badge&logo=flask&logoColor=white)
+![Prometheus](https://img.shields.io/badge/Prometheus-E6522C?style=for-the-badge&logo=prometheus&logoColor=white)
+![Grafana](https://img.shields.io/badge/Grafana-F46800?style=for-the-badge&logo=grafana&logoColor=white)
 
-- **Application** : Flask qui compte le nombre de visites  
-- **Monitoring** : Prometheus pour collecter les métriques  
-- **Dashboard** : Grafana pour visualiser les métriques en temps réel  
-- **Lancement facile** : Docker Compose pour orchestrer tous les services  
+> Application de monitoring DevOps illustrant l'intégration de **Docker**, **Prometheus** et **Grafana** pour surveiller une application web en temps réel.
 
 ---
 
-## Architecture du projet
+## 📋 Table des matières
 
-```text
-┌──────────────┐      ┌───────────────┐
-│   Flask App  │ ---> │ Prometheus    │ ---> Grafana
-│  /metrics    │      │ scrapes data  │    Dashboard
-└──────────────┘      └───────────────┘
+- [Description](#-description)
+- [Architecture](#-architecture)
+- [Fichiers du projet](#-fichiers-du-projet)
+- [Prérequis](#-prérequis)
+- [Installation](#-installation-et-lancement)
+- [Utilisation](#-utilisation)
+- [Objectifs pédagogiques](#-objectifs-pédagogiques)
 
-Flask App expose / et /metrics
+---
 
-Prometheus récupère les métriques via /metrics
+## 📖 Description
 
-Grafana affiche un dashboard en temps réel basé sur ces métriques
+Ce projet met en place une stack de monitoring complète avec trois composants principaux :
 
-Fichiers principaux
-Fichier	Description
-app.py	Application Flask avec compteur de visites et endpoint Prometheus
-requirements.txt	Dépendances Python (Flask, prometheus_client)
-Dockerfile	Image Docker pour l’application Flask
-prometheus.yml	Configuration de Prometheus pour scraper l’app Flask
-docker-compose.yml	Orchestration Docker des 3 services : app, Prometheus, Grafana
-README.md	Documentation du projet
-grafana_dashboard.json (optionnel)	Export JSON du dashboard Grafana
-Prérequis
+| Composant | Rôle |
+|-----------|------|
+| 🐍 **Flask** | Application web qui expose un compteur de visites et un endpoint `/metrics` |
+| 📊 **Prometheus** | Collecte et stocke les métriques exposées par Flask toutes les 5 secondes |
+| 📈 **Grafana** | Visualise les métriques sous forme de dashboard interactif en temps réel |
 
-Docker et Docker Compose installés sur la machine
+---
 
-Navigateur pour accéder à l’application, Prometheus et Grafana
+## 🏗 Architecture
+```
+┌─────────────────────────────────────────────────────────┐
+│                    Docker Network                        │
+│                                                          │
+│  ┌─────────────┐    scrape     ┌──────────────┐         │
+│  │  Flask App  │ ────────────> │  Prometheus  │         │
+│  │             │               │              │         │
+│  │  :5000/     │               │    :9090     │         │
+│  │  :5000/     │               └──────┬───────┘         │
+│  │   metrics   │                      │ data source     │
+│  └─────────────┘               ┌──────▼───────┐         │
+│                                 │   Grafana    │         │
+│                                 │    :3000     │         │
+│                                 └──────────────┘         │
+└─────────────────────────────────────────────────────────┘
+```
 
-Git pour récupérer le projet depuis GitHub (optionnel)
+**Flux de données :**
+1. L'utilisateur visite l'app Flask → le compteur s'incrémente
+2. Prometheus scrape `/metrics` toutes les **5 secondes**
+3. Grafana interroge Prometheus et affiche les métriques en **temps réel**
 
-Installation et lancement
+---
 
-Cloner le projet depuis GitHub :
+## 📁 Fichiers du projet
+```
+devops-monitoring/
+├── app.py                    # Application Flask (compteur + endpoint /metrics)
+├── requirements.txt          # Dépendances Python (Flask, prometheus_client)
+├── Dockerfile                # Image Docker pour l'app Flask
+├── prometheus.yml            # Config Prometheus (scrape interval, targets)
+├── docker-compose.yml        # Orchestration des 3 services
+├── grafana_dashboard.json    # Export JSON du dashboard Grafana (optionnel)
+└── README.md                 # Documentation
+```
 
+---
+
+## ✅ Prérequis
+
+- [Docker](https://docs.docker.com/get-docker/) & [Docker Compose](https://docs.docker.com/compose/install/) installés
+- Un navigateur web
+- *(Optionnel)* Git pour cloner le projet
+
+---
+
+## 🚀 Installation et lancement
+
+### 1. Cloner le projet
+```bash
 git clone https://github.com/iminesaid/devops-monitoring.git
 cd devops-monitoring
+```
 
-Lancer tous les services :
-
+### 2. Lancer les services
+```bash
 docker-compose up --build
+```
 
-Première fois : Docker va construire les images et télécharger Prometheus/Grafana → peut prendre quelques minutes
+> ⏳ **Première fois :** Docker va construire les images et télécharger Prometheus/Grafana — cela peut prendre quelques minutes.
+> ⚡ **Fois suivantes :** relancer simplement avec `docker-compose up`
 
-Après : tu pourras relancer juste avec docker-compose up
+### 3. Accéder aux services
 
-Accéder aux services depuis un navigateur :
+| Service | URL | Credentials |
+|---------|-----|-------------|
+| 🐍 Flask App | http://\<IP_VM\>:5000 | — |
+| 📊 Prometheus | http://\<IP_VM\>:9090 | — |
+| 📈 Grafana | http://\<IP_VM\>:3000 | `admin` / `admin` |
 
-Service	URL
-Application Flask	http://<IP_VM>:5000
-Prometheus	http://<IP_VM>:9090
-Grafana	http://<IP_VM>:3000
+> 💡 Remplace `<IP_VM>` par l'IP de ta machine ou utilise `localhost` en local.
 
-Login Grafana : admin / admin
+### 4. Arrêter les services
+```bash
+docker-compose down
+```
 
-Remplace <IP_VM> par l’IP de ta VM ou localhost si tu lances sur ton PC.
+---
 
-Utilisation
+## 🎮 Utilisation
 
-Rafraîchis la page Flask → le compteur visits augmente
+1. **Visite l'app Flask** → rafraîchis la page plusieurs fois, le compteur `visits_total` augmente
+2. **Ouvre Prometheus** → tape `visits_total` dans la barre de recherche pour voir la métrique
+3. **Ouvre Grafana** → connecte-toi et explore le dashboard pour voir l'évolution en temps réel
 
-Prometheus scrappe les métriques automatiquement toutes les 5 secondes
+### Exemple de métrique Prometheus
+```
+# HELP visits_total Total number of visits
+# TYPE visits_total counter
+visits_total 5
+```
 
-Grafana met à jour le dashboard en temps réel
+---
 
-Exemple de métrique Prometheus
-visits_total  5
+## 🎯 Objectifs pédagogiques
 
-Le nombre correspond aux visites sur la page / de l’application
+- 🐳 Maîtriser **Docker Compose** pour l'orchestration multi-services
+- 🔍 Comprendre le fonctionnement de **Prometheus** (scraping, métriques, PromQL)
+- 📊 Construire un **dashboard Grafana** connecté à une source de données réelle
+- 🔄 Visualiser le **flux DevOps** complet : app → métriques → monitoring → visualisation
 
-Points forts / objectifs pédagogiques
+---
 
-Apprentissage de Docker Compose et orchestration multi-services
+## 🤝 Contribution
 
-Découverte de Prometheus et Grafana pour le monitoring
+Les contributions sont les bienvenues ! N'hésite pas à ouvrir une *issue* ou une *pull request*.
 
-Visualisation des métriques en temps réel pour comprendre le flux DevOps
+---
 
-Déploiement simple sur une machine locale ou VM
+<p align="center">
+  Made with ❤️ — <a href="https://github.com/iminesaid">@iminesaid</a>
+</p>
