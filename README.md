@@ -11,13 +11,13 @@
 
 ## Table des matières
 
-- Description
-- Architecture
-- Fichiers du projet
-- Prérequis
-- Installation
-- Utilisation
-- Objectifs du projet
+- [Description](#description)
+- [Architecture](#architecture)
+- [Fichiers du projet](#fichiers-du-projet)
+- [Prérequis](#prérequis)
+- [Installation](#installation-et-lancement)
+- [Utilisation](#utilisation)
+- [Objectifs du projet](#objectifs-du-projet)
 
 ---
 
@@ -36,24 +36,22 @@ L'objectif est de montrer comment on peut **monitorer une application avec des o
 ---
 
 ## Architecture
-
-
+```
 +─────────────────────────────────────────────────────────+
-| Docker Network |
-| |
-| +─────────────+ scrape +──────────────+ |
-| | Flask App | ────────────> | Prometheus | |
-| | | | | |
-| | :5000 | | :9090 | |
-| | /metrics | +──────+───────+ |
-| +─────────────+ | |
-| | datasource |
-| +──────v───────+ |
-| | Grafana | |
-| | :3000 | |
-| +──────────────+ |
+|                    Docker Network                        |
+|                                                          |
+|  +─────────────+    scrape     +──────────────+         |
+|  |  Flask App  | ────────────> |  Prometheus  |         |
+|  |             |               |              |         |
+|  |  :5000      |               |    :9090     |         |
+|  |  /metrics   |               +──────+───────+         |
+|  +─────────────+                      | datasource      |
+|                                +──────v───────+         |
+|                                |   Grafana    |         |
+|                                |    :3000     |         |
+|                                +──────────────+         |
 +─────────────────────────────────────────────────────────+
-
+```
 
 ### Comment ça fonctionne
 
@@ -65,102 +63,94 @@ L'objectif est de montrer comment on peut **monitorer une application avec des o
 ---
 
 ## Fichiers du projet
-
-
+```
 devops-monitoring/
 ├── app.py
 ├── requirements.txt
 ├── Dockerfile
 ├── prometheus.yml
 ├── docker-compose.yml
-├── grafana_dashboard.json (optionnel)
+├── grafana_dashboard.json    (optionnel)
 └── README.md
+```
 
-
-### Description rapide
-
-- **app.py** → application Flask avec le compteur de visites  
-- **requirements.txt** → dépendances Python  
-- **Dockerfile** → image Docker pour l'application  
-- **prometheus.yml** → configuration de Prometheus  
-- **docker-compose.yml** → lance tous les services ensemble  
-- **grafana_dashboard.json** → export du dashboard Grafana  
+- **app.py** — application Flask avec le compteur de visites
+- **requirements.txt** — dépendances Python
+- **Dockerfile** — image Docker pour l'application
+- **prometheus.yml** — configuration de Prometheus
+- **docker-compose.yml** — lance tous les services ensemble
+- **grafana_dashboard.json** — export du dashboard Grafana
 
 ---
 
 ## Prérequis
 
-Avant de lancer le projet il faut avoir :
-
-- Docker
-- Docker Compose
+- [Docker](https://docs.docker.com/get-docker/) et [Docker Compose](https://docs.docker.com/compose/install/)
 - Un navigateur web
-
-Git est optionnel si vous clonez le projet.
+- Git *(optionnel)*
 
 ---
 
 ## Installation et lancement
 
 ### 1. Cloner le projet
-
 ```bash
 git clone https://github.com/iminesaid/devops-monitoring.git
 cd devops-monitoring
-2. Lancer les services
+```
+
+### 2. Lancer les services
+```bash
 docker-compose up --build
+```
 
-La première fois Docker doit télécharger les images, donc cela peut prendre un peu de temps.
+> La première fois, Docker doit télécharger les images — cela peut prendre quelques minutes. Pour les lancements suivants, utilise simplement `docker-compose up`.
 
-Pour les lancements suivants :
+### 3. Accéder aux services
 
-docker-compose up
-Accès aux services
-Service	URL
-Flask	http://localhost:5000
+| Service | URL | Identifiants |
+|---------|-----|--------------|
+| Flask | http://localhost:5000 | — |
+| Prometheus | http://localhost:9090 | — |
+| Grafana | http://localhost:3000 | `admin` / `admin` |
 
-Prometheus	http://localhost:9090
+### 4. Arrêter les services
+```bash
+docker-compose down
+```
 
-Grafana	http://localhost:3000
+---
 
-Connexion Grafana :
+## Utilisation
 
-user : admin
-password : admin
-Utilisation
+1. Ouvrir l'application Flask dans le navigateur.
+2. Rafraîchir la page plusieurs fois — le compteur de visites augmente.
+3. Prometheus récupère cette métrique automatiquement.
+4. Grafana affiche l'évolution dans le dashboard.
 
-Ouvrir l'application Flask dans le navigateur.
-
-Rafraîchir la page plusieurs fois.
-
-Le compteur de visites augmente.
-
-Prometheus récupère cette métrique automatiquement.
-
-Grafana affiche l'évolution dans le dashboard.
-
-Exemple de métrique
+### Exemple de métrique
+```
+# HELP visits_total Total number of visits
+# TYPE visits_total counter
 visits_total 5
+```
 
 Cela signifie que la page a été visitée 5 fois.
 
-Objectifs du projet
+---
+
+## Objectifs du projet
 
 Ce projet m'a permis de :
 
-Comprendre comment dockeriser une application
+- Comprendre comment dockeriser une application
+- Utiliser Docker Compose pour lancer plusieurs services
+- Découvrir Prometheus et le scraping de métriques
+- Créer un dashboard Grafana
+- Voir le fonctionnement d'une petite stack de monitoring DevOps
 
-Utiliser Docker Compose pour lancer plusieurs services
+---
 
-Découvrir Prometheus et le scraping de métriques
-
-Créer un dashboard Grafana
-
-Voir le fonctionnement d'une petite stack de monitoring DevOps
-
-Auteur
-
-Imene Said
-
-GitHub :
-https://github.com/iminesaid
+<p align="center">
+  <a href="https://github.com/iminesaid">github.com/iminesaid</a>
+</p>
